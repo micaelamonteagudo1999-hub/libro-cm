@@ -1,0 +1,112 @@
+let totalPages = 229;
+let currentPage = 1;
+let images = {};
+let dragging = false;
+let swipeStartX = 0;
+let pageCurl = 0; 
+let showJump = false;
+let pressTimer = 0;
+
+function preload() {
+  for (let i = 1; i <= totalPages; i++) {
+    let num = nf(i, 3);
+    images[i] = loadImage(`images/pagina_${num}.jpg`);
+  }
+}
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  let saved = localStorage.getItem("page");
+  if (saved) currentPage = int(saved);
+}
+
+function draw() {
+  background(240);
+  imageMode(CENTER);
+  image(images[currentPage], width/2, height/2, width, height);
+
+  // efecto de hoja curvada
+  if (pageCurl > 0) {
+    noFill();
+    stroke(0, 60);
+    beginShape();
+    curveVertex(width, 0);
+    for (let y = 0; y < height; y += 50) {
+      curveVertex(width - pageCurl, y);
+    }
+    curveVertex(width, height);
+    endShape();
+  }
+
+  // barra abajo para progreso rápido
+  let pct = currentPage / totalPages;
+  noStroke();
+  fill(0,80);
+  rect(0, height - 10, width * pct, 10);
+}
+
+function touchStarted() {
+  dragging = true;
+  swipeStartX = mouseX;
+  pressTimer = millis();
+}
+
+function touchEnded() {
+  dragging = false;
+  let diff = mouseX - swipeStartX;
+
+  // swipe derecha → izquierda: siguiente página
+  if (diff < -50) nextPage();
+
+  // swipe izquierda → derecha: anterior
+  if (diff > 50) prevPage();
+
+  pageCurl = 0;
+
+  // si mantuvo presionado más de 2 segundos: abrir menú rápido
+  if (millis() - pressTimer > 2000) {
+    toggleJump();
+  }
+}
+
+function touchMoved() {
+  if (dragging) {
+    pageCurl = constrain(abs(mouseX - swipeStartX), 0, width / 1.3);
+  }
+}
+
+function nextPage() {
+  if (currentPage < totalPages) {
+    currentPage++;
+    localStorage.setItem("page", currentPage);
+  }
+}
+
+function prevPage() {
+  if (currentPage > 1) {
+    currentPage--;
+    localStorage.setItem("page", currentPage);
+  }
+}
+
+function toggleJump() {
+  let box = document.getElementById("jumpBox");
+  if (box.style.display === "block") {
+    box.style.display = "none";
+  } else {
+    box.style.display = "block";
+  }
+}
+
+function jumpPage() {
+  let n = parseInt(document.getElementById("jumpInput").value);
+  if (n >= 1 && n <= totalPages) {
+    currentPage = n;
+    localStorage.setItem("page", currentPage);
+  }
+  toggleJump();
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
