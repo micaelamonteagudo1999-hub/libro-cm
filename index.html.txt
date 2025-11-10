@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<title>Lector</title>
+
+<!-- Librería p5.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
+
+<!-- Nuestro sketch -->
+<script src="sketch.js"></script>
+
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #f2e9d8;
+  touch-action: none;
+  user-select: none;
+  font-family: sans-serif;
+}
+#jumpBox {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: white;
+  border: 2px solid #222;
+  padding: 10px;
+  display: none;
+}
+</style>
+</head>
+<body>
+
+<div id="jumpBox">
+  <input id="jumpInput" type="number" style="width:80px;">
+  <button onclick="jumpPage()">Ir</button>
+</div>
+
+</body>
+</html>
