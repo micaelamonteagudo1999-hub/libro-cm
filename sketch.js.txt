@@ -1,0 +1,141 @@
+// p5.js reader — usa images/image_001.jpg ... image_229.jpg
+let totalPages = 229;
+let currentPage = 1;
+let pages = [];
+let loading = true;
+let loaded = 0;
+
+let dragging = false;
+let startX = 0, curX = 0;
+let pressStart = 0;
+const HOLD_MS = 2000;
+
+function preload() {
+  // cargamos todas las imágenes (si tenés problemas de memoria, puedo pasarte la versión con cache)
+  for (let i = 1; i <= totalPages; i++) {
+    let n = nf(i, 3);
+    pages[i] = loadImage(`images/image_${n}.jpg`, 
+      img => { loaded++; }, 
+      err => { 
+        // placeholder en caso de error
+        let p = createImage(100, 100);
+        p.loadPixels();
+        for (let k=0;k<p.pixels.length;k++) p.pixels[k] = color(255);
+        p.updatePixels();
+        pages[i] = p;
+        loaded++;
+      }
+    );
+  }
+}
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  imageMode(CENTER);
+  let saved = localStorage.getItem("lector_page");
+  if (saved) currentPage = constrain(int(saved), 1, totalPages);
+  // si todas las imágenes están listas -> loading false (comprobar)
+  checkLoaded();
+}
+
+function checkLoaded(){
+  // espera hasta que todas estén cargadas (o hasta que loaded == totalPages)
+  if (loaded >= totalPages) {
+    loading = false;
+  } else {
+    setTimeout(checkLoaded, 200);
+  }
+}
+
+function draw() {
+  background(20);
+  if (loading) {
+    fill(255);
+    noStroke();
+    textAlign(CENTER, CENTER);
+    textSize(20);
+    text(`Cargando imágenes... ${loaded} / ${totalPages}`, width/2, height/2);
+    return;
+  }
+
+  // dibuja la página actual centrada y a pantalla completa
+  let img = pages[currentPage];
+  if (img) image(img, width/2, height/2, width, height);
+
+  // barra de progreso abajo
+  noStroke();
+  fill(255, 200);
+  let pct = currentPage / totalPages;
+  rect(0, height - 8, width * pct, 8);
+}
+
+function touchStarted() {
+  if (loading) return false;
+  dragging = true;
+  startX = touchX || mouseX;
+  curX = startX;
+  pressStart = millis();
+  return false;
+}
+
+function touchMoved() {
+  if (!dragging) return false;
+  curX = touchX || mouseX;
+  return false;
+}
+
+function touchEnded() {
+  if (loading) return false;
+  dragging = false;
+  let diff = (touchX || mouseX) - startX;
+
+  // swipe
+  if (diff < -60) {
+    nextPage();
+  } else if (diff > 60) {
+    prevPage();
+  } else {
+    // tap: si mantuviste > HOLD_MS abre jump
+    if (millis() - pressStart >= HOLD_MS) toggleJumpBox();
+  }
+
+  return false;
+}
+
+function nextPage(){
+  if (currentPage < totalPages) {
+    currentPage++;
+    saveProgress();
+  }
+}
+
+function prevPage(){
+  if (currentPage > 1) {
+    currentPage--;
+    saveProgress();
+  }
+}
+
+function saveProgress(){
+  try{ localStorage.setItem("lector_page", String(currentPage)); }catch(e){}
+}
+
+function toggleJumpBox() {
+  let b = document.getElementById("jumpBox");
+  if (!b) return;
+  if (b.style.display === "block") b.style.display = "none";
+  else { b.style.display = "block"; document.getElementById("jumpInput").focus(); }
+}
+
+function jumpPage() {
+  let v = parseInt(document.getElementById("jumpInput").value);
+  if (!isNaN(v) && v >= 1 && v <= totalPages) {
+    currentPage = v;
+    saveProgress();
+  }
+  toggleJumpBox();
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
