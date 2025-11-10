@@ -1,44 +1,38 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
 <title>Lector</title>
 
-<!-- Librería p5.js -->
+<!-- p5.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
 
-<!-- Nuestro sketch -->
+<!-- nuestro sketch -->
 <script src="sketch.js"></script>
 
 <style>
-body {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  background: #f2e9d8;
-  touch-action: none;
-  user-select: none;
-  font-family: sans-serif;
-}
-#jumpBox {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background: white;
-  border: 2px solid #222;
-  padding: 10px;
-  display: none;
-}
+  html,body { margin:0; padding:0; height:100%; background:#111; -webkit-user-select:none; user-select:none; }
+  canvas { display:block; touch-action:none; }
+  #jumpBox {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    background: #fff;
+    border-radius: 8px;
+    padding: 8px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+    display: none;
+    z-index: 9999;
+  }
+  #jumpBox input{ width:76px; padding:6px; font-size:16px; }
+  #jumpBox button{ padding:6px 8px; margin-left:8px; }
 </style>
 </head>
 <body>
-
-<div id="jumpBox">
-  <input id="jumpInput" type="number" style="width:80px;">
-  <button onclick="jumpPage()">Ir</button>
-</div>
-
+  <div id="jumpBox">
+    <input id="jumpInput" type="number" min="1" />
+    <button onclick="jumpPage()">Ir</button>
+  </div>
 </body>
 </html>
